@@ -436,6 +436,6 @@ public class BoardController {
 		return url;
 	}
 	
-	
+	///ªÏ∑¡¡‡!!!!
 	
 }
