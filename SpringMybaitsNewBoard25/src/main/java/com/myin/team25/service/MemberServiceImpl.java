@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import com.myin.team25.domain.MemberVo;
 import com.myin.team25.service.MemberService;
 import com.myin.team25.persistence.MemberService_Mapper;
-
+//»Ð
 @Service("MemberServiceImpl")
 public class MemberServiceImpl implements MemberService{
 
