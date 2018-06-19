@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.myin.team25.persistence.BoardService_Mapper">
+
+<sql id="search">
+	<if test="searchType != null and searchType.equals('writer')">
+	and writer like '%'||#{keyword}||'%'
+	</if>
+	<if test="searchType != null and searchType.equals('subject')">
+	and subject like '%'||#{keyword}||'%'
+	</if>
+
+</sql>
+
+<!-- id가 메소드 이름, parameterType이 넘기는 파라미터 값, resultType이 리턴값 -->
+<select id="SelectBoardOne" parameterType="Integer"  resultType="bvo">
+select * from newBoard25 where del_yn='N' and bBidx=#{bBidx}
+</select>
+
+<select id="SelectBoardAll" parameterType="scri" resultType="bvo">
+<!-- select * from Board25 where del_yn='N' -->
+ <![CDATA[select C.* from (
+		select B.* from (
+			select Row_number() over(order by oidx desc,updown,bBidx desc) rn, A.*
+			from newBoard25 A where del_yn='N' 
+			]]> 
+			<include refid="search"></include>
+			<![CDATA[
+			) B
+		where B.rn <= #{pageEnd}) C
+	where C.rn >= #{pageStart}
+	]]> 
+</select>
+
+
+<select id="TotalRecordCount" parameterType="scri" resultType="Integer">
+
+select count(*) from newboard25 where del_yn='N' <include refid="search"></include>
+
+</select>
+
+<insert id="InsertBoard" parameterType="hashmap">
+insert into newBoard25 (bBidx, memberMidx,subject,content,writer,password,ip, oidx, filename) values(SEQ_BIDX.NEXTVAL,#{memberMidx},#{subject},#{content},#{writer},#{password},#{ip},SEQ_BIDX.NEXTVAL,#{filename})
+</insert>
+
+<update id="UpdateBoard" parameterType="hashmap">
+update newBoard25 set subject=#{subject} , content=#{content}, ip=#{ip}, modifyday=sysdate where bBidx=#{bBidx} and memberMidx=#{memberMidx} and password=#{password}
+</update>
+
+<update id="DeleteBoard" parameterType="hashmap">
+update newBoard25 set del_yn='Y', ip=#{ip} ,modifyday=sysdate where bBidx=#{bBidx} and password=#{password} and memberMidx=#{memberMidx}
+</update>
+
+<update id="ReplyUpdateBoard" parameterType="hashmap">
+update newboard25 set updown=updown+1 where oidx = #{oidx} and updown > #{updown}
+</update>
+
+<insert id="ReplyInsertBoard" parameterType="hashmap">
+insert into newboard25 values(SEQ_BIDX.NEXTVAL, #{memberMidx},#{subject},#{content},#{writer},#{password},default,null,#{ip},default,#{oidx},#{updown}+1,#{leftright}+1,null)
+</insert>
+
+<select id="BoardMemberInfo"  resultType="hashmap">
+select newboard25.bbidx,member25.membername,(118-substr(memberjumin,1,2)+1) as age, member25.memberip from member25,newboard25 where member25.membermidx= newboard25.membermidx
+</select>
+
+
+
+
+</mapper>

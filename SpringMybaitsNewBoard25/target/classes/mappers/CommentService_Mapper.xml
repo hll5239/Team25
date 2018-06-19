@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.myin.team25.persistence.CommentService_Mapper">
+
+<insert id="InsertCommentAll" parameterType="hashmap">
+insert into comment25 values(SEQ_CIDX.NEXTVAL,#{cwriter},#{ccontent},default,null,#{ip},default,#{bbidx},#{membermidx})
+</insert>
+
+<select id="SelectCommentAll"  parameterType="Integer" resultType="cvo" >
+ <![CDATA[
+select * from(select ROW_NUMBER() OVER (order by cidx desc) rnum, C.* from comment25 C where del_yn='N' and bbidx=#{bbidx})A where A.rnum<=10
+]]>
+</select>
+
+<update id="DeleteComment" parameterType="hashmap">
+update comment25 set del_yn = 'y', deleteday=sysdate,ip =#{ip} where cidx = #{cidx} and membermidx = #{membermidx}
+</update>
+
+<select id="getCommentMore"  parameterType="Integer" resultType="cvo" >
+ <![CDATA[
+select * from(select ROW_NUMBER() OVER (order by cidx desc) rnum, C.* from comment25 C where del_yn='N' and bbidx=#{0})A where A.rnum<=#{1}*#{2}
+]]>
+</select>
+
+</mapper>

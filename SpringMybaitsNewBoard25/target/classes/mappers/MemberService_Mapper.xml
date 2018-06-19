@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.myin.team25.persistence.MemberService_Mapper">
+
+<!-- id가 메소드 이름, parameterType이 넘기는 파라미터 값, resultType이 리턴값 -->
+
+<select id="selectMemberAll" resultType="mvo">
+select * from Member25
+</select>
+
+<select id="maxMember"  resultType="Integer">
+select count(*) from Member25
+</select>
+
+<select id="selectMemberOne" parameterType="String"  resultType="mvo">
+select * from Member25 where memberId=#{memberId}
+</select>
+
+<select id="loginCheck" parameterType="hashmap"  resultType="mvo">
+select * from Member25 where memberId=#{memberId} and memberPassword=#{memberPassword}
+</select>
+
+<insert id="insertMember" parameterType="hashmap">
+insert into Member25 values(#{memberMidx},#{memberId},#{memberName},#{memberPassword},#{memberJumin},#{memberEmail},#{memberAddr},#{memberSex},#{memberIp},sysdate,null,#{bidx})
+</insert>
+
+<update id="updateMember" parameterType="hashmap">
+update Member25 set memberPassword=#{memberPassword}, memberEmail=#{memberEmail}, memberAddr=#{memberAddr}, memberIp=#{memberIp},modifyDay=sysdate ,bidx=#{bidx} where memberMidx=#{memberMidx}
+</update>
+
+<update id="keepLogin">
+update member25 set sessionkey = #{sessionkey}, sessionLimit = #{sessionLimit} where memberMidx = #{memberMidx}
+</update>
+
+<select id="checkAutoLogin" resultType = "mvo">
+select * from member25 where sessionkey = #{sessionkey}
+ and sessionlimit > sysdate
+</select>
+
+</mapper>
